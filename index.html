@@ -36,6 +36,7 @@
 
         code {
             font-family: Consolas, monospace;
+            white-space: pre-wrap;
         }
 
         .section {
@@ -91,7 +92,7 @@
     </div>
 
     <div class="section">
-        <h2>🔁 6. Tinker (Testing DB)</h2>
+        <h2>🔁 Tinker (Testing DB)</h2>
         <pre><button class="copy-btn">Copy</button><code>php artisan tinker
 
 User::all();
@@ -104,7 +105,7 @@ User::create(['name' => 'Shoaib', 'email' => 'a@a.com', 'password' => bcrypt('12
     </div>
 
     <div class="section">
-        <h2>🧪 8. Validation Example</h2>
+        <h2>🧪 Validation Example</h2>
         <pre><button class="copy-btn">Copy</button><code>$request->validate([
   'name' => 'required|string|max:255',
   'email' => 'required|email|unique:users',
@@ -112,7 +113,7 @@ User::create(['name' => 'Shoaib', 'email' => 'a@a.com', 'password' => bcrypt('12
     </div>
 
     <div class="section">
-        <h2>📤 9. File Upload</h2>
+        <h2>📤 File Upload</h2>
         <pre><button class="copy-btn">Copy</button><code>if ($request->hasFile('avatar')) {
   $path = $request->file('avatar')->store('avatars');
 }</code></pre>
@@ -125,15 +126,229 @@ User::create(['name' => 'Shoaib', 'email' => 'a@a.com', 'password' => bcrypt('12
 
     <div class="section">
         <h2>📚 Forget Password</h2>
-        <pre><button class="copy-btn">Copy</button><code>https://www.itsolutionstuff.com/post/laravel-12-custom-forgot-password-tutorialexample.html    </code></pre>
+        <pre><button class="copy-btn">Copy</button><code>https://www.itsolutionstuff.com/post/laravel-12-custom-forgot-password-tutorialexample.html</code></pre>
     </div>
+
     <div class="section">
-        <h2>📚 Client Side validation</h2>
+        <h2>📚 Client Side Validation</h2>
         <pre><button class="copy-btn">Copy</button><code>https://www.itsolutionstuff.com/post/laravel-12-client-side-form-validation-using-jqueryexample.html</code></pre>
     </div>
+
     <div class="section">
-        <h2>📚 How to use rich editor in laravel</h2>
+        <h2>📚 How to Use Rich Editor in Laravel</h2>
         <pre><button class="copy-btn">Copy</button><code>https://www.itsolutionstuff.com/post/how-to-use-quill-rich-text-editor-in-laravel-12example.html</code></pre>
+    </div>
+
+    <div class="section">
+        <h2>📚 Many to Many CRUD</h2>
+        <h4>Migration Files</h4>
+        <pre><button class="copy-btn">Copy</button><code>php artisan make:model Product -m
+
+// database/migrations/xxxx_xx_xx_create_products_table.php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up() {
+        Schema::create('products', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // who added the product
+            $table->timestamps();
+        });
+    }
+
+    public function down() {
+        Schema::dropIfExists('products');
+    }
+};
+
+
+-----------------------xxxxxx-------------------------------
+
+php artisan make:model Category -m
+
+// database/migrations/xxxx_xx_xx_create_categories_table.php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up() {
+        Schema::create('categories', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->after('id')->constrained()->onDelete('cascade'); 
+            $table->string('name');
+            $table->timestamps();
+        });
+    }
+
+    public function down() {
+        Schema::dropIfExists('categories');
+    }
+};
+-----------------------xxxxxx-------------------------------
+
+php artisan make:migration create_category_product_table --create=category_product
+
+
+
+// database/migrations/xxxx_xx_xx_create_category_product_table.php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up()
+    {
+        Schema::create('category_product', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->timestamps();
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('category_product');
+    }
+};
+
+
+php artisan migrate
+
+</code></pre>
+        <h4>Models</h4>
+        <pre>
+        <button class="copy-btn">Copy</button>l
+        <code>
+            php artisan make:model Product
+
+            namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Product extends Model
+{
+    protected $fillable = ['name', 'user_id'];
+
+    // 🔗 Many-to-Many with Category
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class);
+    }
+
+    // 👤 Belongs to a User
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}
+-----------------------xxxxxx-------------------------------
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Product extends Model
+{
+    protected $fillable = ['name', 'user_id'];
+
+    // 🔗 Many-to-Many with Category
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class);
+    }
+
+    // 👤 Belongs to a User
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}
+
+
+-----------------------xxxxxx-------------------------------
+
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Category extends Model
+{
+    protected $fillable = ['name', 'user_id'];
+
+    // 🔗 Many-to-Many with Product
+    public function products()
+    {
+        return $this->belongsToMany(Product::class);
+    }
+
+    // 👤 Belongs to a User
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}
+
+-----------------------xxxxxx-------------------------------
+
+
+
+namespace App\Models;
+
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use App\Models\Product;
+use App\Models\Category;
+
+class User extends Authenticatable
+{
+    use HasApiTokens, HasFactory, Notifiable;
+
+    // 🔐 Fillable fields
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
+
+    // 🛡️ Hidden fields
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    // 🧠 Cast fields
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    // 📦 A user can add many products
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    // 🏷️ A user can add many categories
+    public function categories()
+    {
+        return $this->hasMany(Category::class);
+    }
+}
+
+
+
+
+        </code>
+        </pre>
     </div>
 
     <script>
