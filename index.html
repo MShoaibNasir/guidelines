@@ -139,13 +139,15 @@ User::create(['name' => 'Shoaib', 'email' => 'a@a.com', 'password' => bcrypt('12
         <pre><button class="copy-btn">Copy</button><code>https://www.itsolutionstuff.com/post/how-to-use-quill-rich-text-editor-in-laravel-12example.html</code></pre>
     </div>
 
-    <div class="section">
-        <h2>📚 Many to Many CRUD</h2>
-        <h4>Migration Files</h4>
-        <pre><button class="copy-btn">Copy</button><code>php artisan make:model Product -m
+ <div class="section">
+    <h2>📚 Many to Many CRUD</h2>
 
-// database/migrations/xxxx_xx_xx_create_products_table.php
-use Illuminate\Database\Migrations\Migration;
+    <!-- Step 1: Create Product Migration -->
+    <h4>Step 1️⃣: Create Product Model & Migration</h4>
+    <pre><button class="copy-btn">Copy</button><code>php artisan make:model Product -m</code></pre>
+
+    <h4>🗃️ Product Migration</h4>
+    <pre><button class="copy-btn">Copy</button><code>use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
@@ -154,7 +156,7 @@ return new class extends Migration {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // who added the product
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -162,15 +164,14 @@ return new class extends Migration {
     public function down() {
         Schema::dropIfExists('products');
     }
-};
+};</code></pre>
 
+    <!-- Step 2: Create Category Migration -->
+    <h4>Step 2️⃣: Create Category Model & Migration</h4>
+    <pre><button class="copy-btn">Copy</button><code>php artisan make:model Category -m</code></pre>
 
------------------------xxxxxx-------------------------------
-
-php artisan make:model Category -m
-
-// database/migrations/xxxx_xx_xx_create_categories_table.php
-use Illuminate\Database\Migrations\Migration;
+    <h4>🗃️ Category Migration</h4>
+    <pre><button class="copy-btn">Copy</button><code>use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
@@ -178,7 +179,7 @@ return new class extends Migration {
     public function up() {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->after('id')->constrained()->onDelete('cascade'); 
+            $table->foreignId('user_id')->after('id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->timestamps();
         });
@@ -187,22 +188,19 @@ return new class extends Migration {
     public function down() {
         Schema::dropIfExists('categories');
     }
-};
------------------------xxxxxx-------------------------------
+};</code></pre>
 
-php artisan make:migration create_category_product_table --create=category_product
+    <!-- Step 3: Create Pivot Table -->
+    <h4>Step 3️⃣: Create Pivot Table Migration</h4>
+    <pre><button class="copy-btn">Copy</button><code>php artisan make:migration create_category_product_table --create=category_product</code></pre>
 
-
-
-// database/migrations/xxxx_xx_xx_create_category_product_table.php
-
-use Illuminate\Database\Migrations\Migration;
+    <h4>🔗 Pivot Table Migration</h4>
+    <pre><button class="copy-btn">Copy</button><code>use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    public function up()
-    {
+    public function up() {
         Schema::create('category_product', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
@@ -211,23 +209,18 @@ return new class extends Migration {
         });
     }
 
-    public function down()
-    {
+    public function down() {
         Schema::dropIfExists('category_product');
     }
-};
+};</code></pre>
 
+    <!-- Step 4: Run Migrations -->
+    <h4>Step 4️⃣: Run Migrations</h4>
+    <pre><button class="copy-btn">Copy</button><code>php artisan migrate</code></pre>
 
-php artisan migrate
-
-</code></pre>
-        <h4>Models</h4>
-        <pre>
-        <button class="copy-btn">Copy</button>l
-        <code>
-            php artisan make:model Product
-
-            namespace App\Models;
+    <!-- Step 5: Define Models -->
+    <h4>Step 5️⃣: Product Model</h4>
+    <pre><button class="copy-btn">Copy</button><code>namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -235,46 +228,19 @@ class Product extends Model
 {
     protected $fillable = ['name', 'user_id'];
 
-    // 🔗 Many-to-Many with Category
     public function categories()
     {
         return $this->belongsToMany(Category::class);
     }
 
-    // 👤 Belongs to a User
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-}
------------------------xxxxxx-------------------------------
+}</code></pre>
 
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-
-class Product extends Model
-{
-    protected $fillable = ['name', 'user_id'];
-
-    // 🔗 Many-to-Many with Category
-    public function categories()
-    {
-        return $this->belongsToMany(Category::class);
-    }
-
-    // 👤 Belongs to a User
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-}
-
-
------------------------xxxxxx-------------------------------
-
-
-namespace App\Models;
+    <h4>📦 Category Model</h4>
+    <pre><button class="copy-btn">Copy</button><code>namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -282,74 +248,275 @@ class Category extends Model
 {
     protected $fillable = ['name', 'user_id'];
 
-    // 🔗 Many-to-Many with Product
     public function products()
     {
         return $this->belongsToMany(Product::class);
     }
 
-    // 👤 Belongs to a User
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-}
+}</code></pre>
 
------------------------xxxxxx-------------------------------
+    <h4>👤 User Model</h4>
+    <pre><button class="copy-btn">Copy</button><code>namespace App\Models;
 
-
-
-namespace App\Models;
-
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use App\Models\Product;
-use App\Models\Category;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    // 🔐 Fillable fields
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $fillable = ['name', 'email', 'password'];
+    protected $hidden = ['password', 'remember_token'];
+    protected $casts = ['email_verified_at' => 'datetime'];
 
-    // 🛡️ Hidden fields
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    // 🧠 Cast fields
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
-
-    // 📦 A user can add many products
     public function products()
     {
         return $this->hasMany(Product::class);
     }
 
-    // 🏷️ A user can add many categories
     public function categories()
     {
         return $this->hasMany(Category::class);
     }
+}</code></pre>
+
+  <h4>Step 6: Create Product Controller</h4>
+    <pre><button class="copy-btn">Copy</button><code>php artisan make:Controller ProductController</code></pre>
+
+    <h4>🗃️ Product Controller</h4>
+    <pre><button class="copy-btn">Copy</button><code>
+   
+
+namespace App\Http\Controllers;
+
+use App\Models\Product;
+use App\Models\Category;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class ProductController extends Controller
+{
+    // 📥 Show Create Form
+    public function create()
+    {
+        $categories = Category::all(); // fetch all categories for checkbox
+        return view('products.create', compact('categories'));
+    }
+
+    // ✅ Store Product with Categories
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'category_ids' => 'required|array',
+            'category_ids.*' => 'exists:categories,id',
+        ]);
+
+        $product = Product::create([
+            'name' => $request->name,
+            'user_id' => Auth::id(), // logged-in user
+        ]);
+
+        // Attach selected categories
+        $product->categories()->attach($request->category_ids);
+
+        return redirect()->route('products.index')->with('success', 'Product added successfully.');
+    }
+
+    // 📄 List All Products
+    public function index()
+    {
+        $products = Product::with('categories', 'user')->latest()->get();
+        return view('products.index', compact('products'));
+    }
 }
+    
+    </code></pre>
+<h4>Step 7: Create Category Controller</h4>
+    <pre><button class="copy-btn">Copy</button><code>php artisan make:controller CategoryController</code></pre>
+
+    <h4>🗃️ Category Controller</h4>
+    <pre><button class="copy-btn">Copy</button><code>
+   
+
+namespace App\Http\Controllers;
+
+use App\Models\Category;
+use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class CategoryController extends Controller
+{
+    // Show all categories with products
+    public function index()
+    {
+        $categories = Category::with(['user', 'products.user'])->get();
+
+        return view('categories.index', compact('categories'));
+    }
+
+    // Show form to create a new category
+    public function create()
+    {
+        return view('categories.create');
+    }
+
+    // Store the new category
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255'
+        ]);
+
+        Category::create([
+            'name' => $request->name,
+            'user_id' => Auth::id(), // Store who created the category
+        ]);
+
+        return redirect()->route('categories.index')->with('success', 'Category created successfully.');
+    }
+
+    // Show a single category with its products
+    public function show(Category $category)
+    {
+        $category->load('products.user');
+
+        return view('categories.show', compact('category'));
+    }
+
+    // Show edit form
+    public function edit(Category $category)
+    {
+        return view('categories.edit', compact('category'));
+    }
+
+    // Update category
+    public function update(Request $request, Category $category)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255'
+        ]);
+
+        $category->update([
+            'name' => $request->name
+        ]);
+
+        return redirect()->route('categories.index')->with('success', 'Category updated successfully.');
+    }
+
+    // Delete category
+    public function destroy(Category $category)
+    {
+        $category->products()->detach(); // Detach all related products
+        $category->delete();
+
+        return redirect()->route('categories.index')->with('success', 'Category deleted successfully.');
+    }
+}
+    
+    </code></pre>   
+
+
+  <h4>Step 8: Create Routes</h4>
+
+    <pre><button class="copy-btn">Copy</button><code>
+   
+
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
+
+
+Route::middleware('auth')->group(function () {
+    Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
+    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
+    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+});
+
+    </code></pre> 
+    
+    
+  <h4>Step 8: categoty list</h4>
+  <p>resources/views/categories/index.blade.php</p>
+
+    <pre><button class="copy-btn">Copy</button><code>
+   
+<pre><code>
+&#64;extends('layouts.app')
+
+&#64;section('content')
+&lt;div class="container"&gt;
+    &lt;h2 class="mb-4"&gt;All Categories&lt;/h2&gt;
+
+    &#64;if(session('success'))
+        &lt;div class="alert alert-success"&gt;{{ '{{ session("success") }}' }}&lt;/div&gt;
+    &#64;endif
+
+    &lt;a href="{{ '{{ route("categories.create") }}' }}" class="btn btn-primary mb-3"&gt;Add New Category&lt;/a&gt;
+
+    &#64;if($categories-&gt;count())
+        &lt;table class="table table-bordered"&gt;
+            &lt;thead&gt;
+                &lt;tr&gt;
+                    &lt;th&gt;Name&lt;/th&gt;
+                    &lt;th&gt;Created By&lt;/th&gt;
+                    &lt;th&gt;Products&lt;/th&gt;
+                    &lt;th&gt;Actions&lt;/th&gt;
+                &lt;/tr&gt;
+            &lt;/thead&gt;
+            &lt;tbody&gt;
+                &#64;foreach($categories as $category)
+                &lt;tr&gt;
+                    &lt;td&gt;{{ '{{ $category->name }}' }}&lt;/td&gt;
+                    &lt;td&gt;{{ '{{ $category->user->name ?? "N/A" }}' }}&lt;/td&gt;
+                    &lt;td&gt;
+                        &#64;if($category-&gt;products-&gt;count())
+                            &lt;ul&gt;
+                                &#64;foreach($category-&gt;products as $product)
+                                    &lt;li&gt;{{ '{{ $product->name }}' }} (by {{ '{{ $product->user->name ?? "N/A" }}' }})&lt;/li&gt;
+                                &#64;endforeach
+                            &lt;/ul&gt;
+                        &#64;else
+                            &lt;em&gt;No products&lt;/em&gt;
+                        &#64;endif
+                    &lt;/td&gt;
+                    &lt;td&gt;
+                        &lt;a href="{{ '{{ route("categories.edit", $category) }}' }}" class="btn btn-sm btn-warning"&gt;Edit&lt;/a&gt;
+                        &lt;form action="{{ '{{ route("categories.destroy", $category) }}' }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure?')"&gt;
+                            &#64;csrf
+                            &#64;method('DELETE')
+                            &lt;button class="btn btn-sm btn-danger"&gt;Delete&lt;/button&gt;
+                        &lt;/form&gt;
+                        &lt;a href="{{ '{{ route("categories.show", $category) }}' }}" class="btn btn-sm btn-info"&gt;View&lt;/a&gt;
+                    &lt;/td&gt;
+                &lt;/tr&gt;
+                &#64;endforeach
+            &lt;/tbody&gt;
+        &lt;/table&gt;
+    &#64;else
+        &lt;p&gt;No categories found.&lt;/p&gt;
+    &#64;endif
+&lt;/div&gt;
+&#64;endsection
+</code></pre>
 
 
 
+    </code></pre>      
+  
 
-        </code>
-        </pre>
-    </div>
+
+</div>
+
 
     <script>
         // Copy button functionality
