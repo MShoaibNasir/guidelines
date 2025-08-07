@@ -76,6 +76,57 @@
         4-ideo gram (Image generator)
       </code></pre>
     </div>
+    <div class="section">
+      <h2>CI/CD Process</h2>
+      <pre><button class="copy-btn">Copy</button><code>
+            For Staging HRU
+            ===============
+            FTP_SERVER 192.199.243.34
+            FTP_USERNAME hru@sld.devstaging.a2zcreatorz.com
+            FTP_PASSWORD ^guta4^m3qt;b?#P
+            SSH_DIR public_html/state-life-dashboard/ifrap2
+            SSH_USER deve
+            DEPLOY_SERVER_KEY key here......
+            ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/github_deploy_key
+            ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/hru-github-deployment-key
+      </code></pre>
+    </div>
+    <div class="section">
+      <h2>Spilting Large Data Into Chunck Data</h2>
+      <pre><button class="copy-btn">Copy</button><code>
+            //Split the 53GB File into 10GB Parts 
+            Command
+            split -b 10G pspc-31july2025.zip pspc_07august2025_
+
+            What it does:
+            -b 10G: Splits into chunks of 10GB.
+
+            pspc-31july2025.zip: Your original 53GB file.
+
+            pspc_31july_: Prefix for output files. This will create files like:
+            pspc_31july_aa
+            pspc_31july_ab
+            pspc_31july_ac
+
+
+            //To combine the files back into a single .zip:
+            Command
+            cat pspc_31july_* > pspc-31july2025-merged.zip
+
+
+            Optional: Verify Integrity
+            You can use md5sum to generate a checksum before splitting and after merging:
+
+            Command
+            md5sum pspc-31july2025.zip
+
+            # after merging
+            Command
+            md5sum pspc-31july2025-merged.zip
+
+            If both checksums match, the merge was perfect.
+      </code></pre>
+    </div>
 
     <div class="section">
       <h2>🧩 Laravel 12 Generate UUID Example</h2>
@@ -174,9 +225,6 @@ return new class extends Migration {
 
       <!-- Step 2: Create Category Migration -->
       <h4>Step 2️⃣: Create Category Model & Migration</h4>
-      <pre><button class="copy-btn">Copy</button><code>php artisan make:model Category -m</code></pre>
-
-      <h4>🗃️ Category Migration</h4>
       <pre><button class="copy-btn">Copy</button><code>use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -185,7 +233,7 @@ return new class extends Migration {
     public function up() {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->after('id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // ❌ removed ->after('id')
             $table->string('name');
             $table->timestamps();
         });
@@ -194,7 +242,8 @@ return new class extends Migration {
     public function down() {
         Schema::dropIfExists('categories');
     }
-};</code></pre>
+};
+</code></pre>
 
       <!-- Step 3: Create Pivot Table -->
       <h4>Step 3️⃣: Create Pivot Table Migration</h4>
@@ -371,7 +420,8 @@ class CategoryController extends Controller
     // Show form to create a new category
     public function create()
     {
-        return view('categories.create');
+        $products=Product::all();
+        return view('categories.create')->with(['products'=>$products]);
     }
 
     // Store the new category
@@ -487,7 +537,7 @@ Route::middleware('auth')->group(function () {
                         &#64;if($category-&gt;products-&gt;count())
                             &lt;ul&gt;
                                 &#64;foreach($category-&gt;products as $product)
-                                    &lt;li&gt;{{ '{{ $product->name }}' }} (by {{ '{{ $product->user->name ?? "N/A" }}' }})&lt;/li&gt;
+                                    &lt;li&gt;{{ $product->name }} (by {{ $product->user->name ?? "N/A" }})&lt;/li&gt;
                                 &#64;endforeach
                             &lt;/ul&gt;
                         &#64;else
@@ -534,18 +584,18 @@ Route::middleware('auth')->group(function () {
             &lt;strong&gt;There were some problems with your input:&lt;/strong&gt;
             &lt;ul&gt;
                 &#64;foreach ($errors-&gt;all() as $error)
-                    &lt;li&gt;{{ '{{ $error }}' }}&lt;/li&gt;
+                    &lt;li&gt;{{ $error }}&lt;/li&gt;
                 &#64;endforeach
             &lt;/ul&gt;
         &lt;/div&gt;
     &#64;endif
 
-    &lt;form action="{{ '{{ route("categories.store") }}' }}" method="POST"&gt;
+    &lt;form action="{{route('categories.store')}}" method="POST"&gt;
         &#64;csrf
 
         &lt;div class="form-group mb-3"&gt;
             &lt;label for="name"&gt;Category Name:&lt;/label&gt;
-            &lt;input type="text" name="name" id="name" class="form-control" required value="{{ '{{ old("name") }}' }}"&gt;
+            &lt;input type="text" name="name" id="name" class="form-control" required value="{{old('name')}}"&gt;
         &lt;/div&gt;
 
         &lt;div class="form-group mb-3"&gt;
@@ -561,7 +611,7 @@ Route::middleware('auth')->group(function () {
         &lt;/div&gt;
 
         &lt;button type="submit" class="btn btn-success"&gt;Create Category&lt;/button&gt;
-        &lt;a href="{{ '{{ route("categories.index") }}' }}" class="btn btn-secondary"&gt;Back&lt;/a&gt;
+        &lt;a href="{{route('categories.index')}}" class="btn btn-secondary"&gt;Back&lt;/a&gt;
     &lt;/form&gt;
 &lt;/div&gt;
 &#64;endsection
@@ -586,7 +636,7 @@ Route::middleware('auth')->group(function () {
             &lt;strong&gt;There were some problems with your input:&lt;/strong&gt;
             &lt;ul&gt;
                 &#64;foreach ($errors-&gt;all() as $error)
-                    &lt;li&gt;{{ '{{ $error }}' }}&lt;/li&gt;
+                    &lt;li&gt;{{ '{{ $error  }}&lt;/li&gt;
                 &#64;endforeach
             &lt;/ul&gt;
         &lt;/div&gt;
@@ -698,18 +748,18 @@ Route::middleware('auth')->group(function () {
             &lt;strong&gt;There were some problems with your input:&lt;/strong&gt;
             &lt;ul&gt;
                 &#64;foreach ($errors-&gt;all() as $error)
-                    &lt;li&gt;{{ '{{ $error }}' }}&lt;/li&gt;
+                    &lt;li&gt;{{ $error }}&lt;/li&gt;
                 &#64;endforeach
             &lt;/ul&gt;
         &lt;/div&gt;
     &#64;endif
 
-    &lt;form action="{{ '{{ route("products.store") }}' }}" method="POST"&gt;
+    &lt;form action="{{  route('products.store')  }}" method="POST"&gt;
         &#64;csrf
 
         &lt;div class="form-group mb-3"&gt;
             &lt;label for="name"&gt;Product Name:&lt;/label&gt;
-            &lt;input type="text" name="name" id="name" class="form-control" required value="{{ '{{ old("name") }}' }}"&gt;
+            &lt;input type="text" name="name" id="name" class="form-control" required value="{{old('name')}}"&gt;
         &lt;/div&gt;
 
         &lt;div class="form-group mb-3"&gt;
@@ -747,7 +797,7 @@ Route::middleware('auth')->group(function () {
             &lt;strong&gt;There were some problems with your input:&lt;/strong&gt;
             &lt;ul&gt;
                 &#64;foreach ($errors-&gt;all() as $error)
-                    &lt;li&gt;{{ '{{ $error }}' }}&lt;/li&gt;
+                    &lt;li&gt;{{ $error }}&lt;/li&gt;
                 &#64;endforeach
             &lt;/ul&gt;
         &lt;/div&gt;
