@@ -783,6 +783,7 @@ Route::middleware('auth')->group(function () {
 
       </code></pre>
     </div>
+
     <div class="section">
       <h2>Product Edit</h2>
       <pre><button class="copy-btn">Copy</button><code>resources/views/products/edit.blade.php
@@ -830,6 +831,23 @@ Route::middleware('auth')->group(function () {
 &lt;/div&gt;
 &#64;endsection
 
+
+
+      </code></pre>
+    </div>
+    <div class="section">
+      <h2>Using Hashing Id</h2>
+      <pre><button class="copy-btn">Copy</button><code>
+    $encryptedId = \Crypt::encryptString($row->user_policy_id);
+    try {
+		
+        $id = Crypt::decryptString($id);
+		
+    } catch (DecryptException $e) {
+        return redirect()->back()->with('error', 'Invalid policy ID.');
+    }
+    
+    
 
 
       </code></pre>
