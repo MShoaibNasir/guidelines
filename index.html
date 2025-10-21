@@ -205,6 +205,7 @@ User::create(['name' => 'Shoaib', 'email' => 'a@a.com', 'password' => bcrypt('12
 
       <h4>🗃️ Product Migration</h4>
       <pre><button class="copy-btn">Copy</button><code>use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
@@ -213,7 +214,6 @@ return new class extends Migration {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -221,7 +221,8 @@ return new class extends Migration {
     public function down() {
         Schema::dropIfExists('products');
     }
-};</code></pre>
+};
+</code></pre>
 
       <!-- Step 2: Create Category Migration -->
       <h4>Step 2️⃣: Create Category Model & Migration</h4>
