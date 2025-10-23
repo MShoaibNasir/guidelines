@@ -886,6 +886,26 @@ class AuthenticateUser
     }
 }
       </code></pre>
+ <pre><button class="copy-btn">Copy</button><code>
+  Open app/Http/Kernel.php
+Find $routeMiddleware section and add this line:
+	 protected $routeMiddleware = [
+    // other middlewares...
+
+    'auth.user' => \App\Http\Middleware\AuthenticateUser::class,
+];
+	 Now Laravel knows your middleware by name:
+👉 auth.user
+      </code></pre>	 
+ <pre><button class="copy-btn">Copy</button><code>
+Open your routes/web.php and write like this:
+
+Route::middleware(['auth.user'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/profile', [UserController::class, 'profile']);
+    Route::get('/settings', [UserController::class, 'settings']);
+});
+      </code></pre>	 	 
     </div>
 
 
