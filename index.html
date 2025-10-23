@@ -856,6 +856,40 @@ Route::middleware('auth')->group(function () {
 
       </code></pre>
     </div>
+	  
+ <div class="section">
+      <h2>Group Middleware</h2>
+      <pre><button class="copy-btn">Copy</button><code>
+    php artisan make:middleware AuthenticateUser
+      </code></pre>
+	       <pre><button class="copy-btn">Copy</button><code>
+   This will create a file here:
+app/Http/Middleware/AuthenticateUser.php
+			   <?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Support\Facades\Auth;
+
+class AuthenticateUser
+{
+    public function handle($request, Closure $next)
+    {
+        if (!Auth::check()) {
+            // if user not logged in → go to login page
+            return redirect()->route('login')->with('error', 'Please login first.');
+        }
+
+        // if logged in → go ahead
+        return $next($request);
+    }
+}
+      </code></pre>
+    </div>
+
+
+	  
 
     <script>
       // Copy button functionality
